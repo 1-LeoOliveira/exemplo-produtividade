@@ -87,12 +87,6 @@
         button:hover {
             background-color: #0056b3;
         }
-        .delete-btn {
-            background-color: #dc3545;
-        }
-        .delete-btn:hover {
-            background-color: #c82333;
-        }
         .notification {
             padding: 15px;
             margin: 10px 0;
@@ -162,13 +156,6 @@
             font-weight: bold;
             color: #343a40;
         }
-        .action-buttons {
-            display: flex;
-            gap: 5px;
-        }
-        .statusAlert {
-            background-color: #fff3cd;
-        }
     </style>
 </head>
 <body>
@@ -189,19 +176,19 @@
                 <div class="dashboard-stats">
                     <div class="stat-box">
                         <h4>Produtividade Média</h4>
-                        <p id="produtividadeMedia">--</p>
+                        <p>85%</p>
                     </div>
                     <div class="stat-box">
                         <h4>Conferentes Ativos</h4>
-                        <p id="conferentesAtivos">--</p>
+                        <p>18/20</p>
                     </div>
                     <div class="stat-box">
                         <h4>Total Verificado</h4>
-                        <p id="totalVerificado">--</p>
+                        <p>1463</p>
                     </div>
                     <div class="stat-box">
                         <h4>Meta Hora</h4>
-                        <p id="metaHora">--</p>
+                        <p>1500</p>
                     </div>
                 </div>
             </div>
@@ -219,7 +206,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Dados serão carregados via PHP -->
+                        <!-- Dados de exemplo -->
                     </tbody>
                 </table>
             </div>
@@ -232,27 +219,27 @@
                 <form id="notificacaoForm">
                     <div class="form-group">
                         <label for="conferente">Conferente:</label>
-                        <select id="conferente" name="conferente" required>
+                        <select id="conferente" required>
                             <option value="">Selecione um conferente</option>
                             <option value="todos">Todos os conferentes</option>
-                            <!-- Opções serão carregadas via PHP -->
+                            <!-- Opções serão adicionadas via JavaScript -->
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="produtividade">Produtividade (últimos 60 min):</label>
-                        <input type="number" id="produtividade" name="produtividade" placeholder="Ex: 85" min="0" max="100" required>
+                        <input type="number" id="produtividade" placeholder="Ex: 85" min="0" max="100" required>
                     </div>
                     <div class="form-group">
                         <label for="itensVerificados">Itens Verificados:</label>
-                        <input type="number" id="itensVerificados" name="itensVerificados" placeholder="Ex: 120" min="0" required>
+                        <input type="number" id="itensVerificados" placeholder="Ex: 120" min="0" required>
                     </div>
                     <div class="form-group">
                         <label for="meta">Meta:</label>
-                        <input type="number" id="meta" name="meta" placeholder="Ex: 150" min="0" required>
+                        <input type="number" id="meta" placeholder="Ex: 150" min="0" required>
                     </div>
                     <div class="form-group">
                         <label for="mensagem">Mensagem Adicional (opcional):</label>
-                        <textarea id="mensagem" name="mensagem" rows="3" placeholder="Mensagem personalizada para o conferente"></textarea>
+                        <textarea id="mensagem" rows="3" placeholder="Mensagem personalizada para o conferente"></textarea>
                     </div>
                     <button type="submit">Enviar Notificação</button>
                 </form>
@@ -276,7 +263,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Dados serão carregados via PHP -->
+                        <!-- Dados serão adicionados via JavaScript -->
                     </tbody>
                 </table>
                 
@@ -284,15 +271,15 @@
                 <form id="novoConferenteForm">
                     <div class="form-group">
                         <label for="nome">Nome:</label>
-                        <input type="text" id="nome" name="nome" required>
+                        <input type="text" id="nome" required>
                     </div>
                     <div class="form-group">
                         <label for="idConferente">ID:</label>
-                        <input type="text" id="idConferente" name="idConferente" required>
+                        <input type="text" id="idConferente" required>
                     </div>
                     <div class="form-group">
                         <label for="estacao">Estação:</label>
-                        <input type="text" id="estacao" name="estacao" required>
+                        <input type="text" id="estacao" required>
                     </div>
                     <button type="submit">Adicionar Conferente</button>
                 </form>
@@ -305,16 +292,16 @@
                 <h3>Configurações do Sistema</h3>
                 <form id="configForm">
                     <div class="form-group">
-                        <label for="metaHoraConfig">Meta por Hora (padrão):</label>
-                        <input type="number" id="metaHoraConfig" name="metaHoraConfig" value="150" min="1" required>
+                        <label for="metaHora">Meta por Hora (padrão):</label>
+                        <input type="number" id="metaHora" value="150" min="1" required>
                     </div>
                     <div class="form-group">
                         <label for="intervaloNotificacao">Intervalo de Notificação (minutos):</label>
-                        <input type="number" id="intervaloNotificacao" name="intervaloNotificacao" value="60" min="10" max="120" required>
+                        <input type="number" id="intervaloNotificacao" value="60" min="10" max="120" required>
                     </div>
                     <div class="form-group">
                         <label for="limiteAlerta">Limite para Alerta de Baixa Produtividade (%):</label>
-                        <input type="number" id="limiteAlerta" name="limiteAlerta" value="70" min="1" max="100" required>
+                        <input type="number" id="limiteAlerta" value="70" min="1" max="100" required>
                     </div>
                     <button type="submit">Salvar Configurações</button>
                 </form>
@@ -339,239 +326,226 @@
             evt.currentTarget.classList.add("active");
         }
         
-        // Carregar dados do dashboard
-        function carregarDashboard() {
-            fetch('api/dashboard.php')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('produtividadeMedia').textContent = data.produtividadeMedia + '%';
-                    document.getElementById('conferentesAtivos').textContent = data.conferentesAtivos;
-                    document.getElementById('totalVerificado').textContent = data.totalVerificado;
-                    document.getElementById('metaHora').textContent = data.metaHora;
-                    
-                    // Carregar tabela de produtividade
-                    const produtividadeTable = document.getElementById('produtividadeTable').getElementsByTagName('tbody')[0];
-                    produtividadeTable.innerHTML = '';
-                    
-                    data.produtividade.forEach(prod => {
-                        const row = produtividadeTable.insertRow();
-                        
-                        // Determinar classe da linha baseada no status
-                        if (prod.produtividade < data.limiteAlerta) {
-                            row.classList.add('statusAlert');
-                        }
-                        
-                        row.innerHTML = `
-                            <td>${prod.nome}</td>
-                            <td>
-                                <div class="progress-bar">
-                                    <div class="progress" style="width: ${prod.produtividade}%">${prod.produtividade}%</div>
-                                </div>
-                            </td>
-                            <td>${prod.itensVerificados}</td>
-                            <td>${prod.produtividade < data.limiteAlerta ? 'Abaixo da meta' : 'Dentro da meta'}</td>
-                            <td>${prod.ultimaNotificacao}</td>
-                        `;
-                    });
-                })
-                .catch(error => console.error('Erro ao carregar dashboard:', error));
-        }
+        // Dados de exemplo para conferentes
+        const conferentes = [
+            { id: "C001", nome: "João Silva", estacao: "E01", status: "Ativo" },
+            { id: "C002", nome: "Maria Oliveira", estacao: "E02", status: "Ativo" },
+            { id: "C003", nome: "Pedro Santos", estacao: "E03", status: "Inativo" },
+            { id: "C004", nome: "Ana Costa", estacao: "E04", status: "Ativo" },
+            { id: "C005", nome: "Carlos Souza", estacao: "E05", status: "Ativo" },
+            { id: "C006", nome: "Lúcia Ferreira", estacao: "E06", status: "Ativo" },
+            { id: "C007", nome: "Roberto Almeida", estacao: "E07", status: "Ativo" },
+            { id: "C008", nome: "Fernanda Lima", estacao: "E08", status: "Ativo" },
+            { id: "C009", nome: "Marcos Pereira", estacao: "E09", status: "Ativo" },
+            { id: "C010", nome: "Juliana Martins", estacao: "E10", status: "Ativo" },
+            { id: "C011", nome: "Ricardo Gomes", estacao: "E11", status: "Ativo" },
+            { id: "C012", nome: "Patrícia Rodrigues", estacao: "E12", status: "Ativo" },
+            { id: "C013", nome: "Guilherme Santos", estacao: "E13", status: "Ativo" },
+            { id: "C014", nome: "Amanda Costa", estacao: "E14", status: "Ativo" },
+            { id: "C015", nome: "Gustavo Oliveira", estacao: "E15", status: "Ativo" },
+            { id: "C016", nome: "Viviane Ferreira", estacao: "E16", status: "Ativo" },
+            { id: "C017", nome: "Henrique Silva", estacao: "E17", status: "Ativo" },
+            { id: "C018", nome: "Camila Sousa", estacao: "E18", status: "Ativo" },
+            { id: "C019", nome: "Bruno Lima", estacao: "E19", status: "Inativo" },
+            { id: "C020", nome: "Tatiana Alves", estacao: "E20", status: "Ativo" }
+        ];
         
-        // Carregar lista de conferentes
-        function carregarConferentes() {
-            fetch('api/conferentes.php')
-                .then(response => response.json())
-                .then(data => {
-                    // Preencher tabela de conferentes
-                    const conferentesTable = document.getElementById('conferentesTable').getElementsByTagName('tbody')[0];
-                    conferentesTable.innerHTML = '';
-                    
-                    data.forEach(conf => {
-                        const row = conferentesTable.insertRow();
-                        row.innerHTML = `
-                            <td>${conf.nome}</td>
-                            <td>${conf.id}</td>
-                            <td>${conf.estacao}</td>
-                            <td>${conf.status}</td>
-                            <td class="action-buttons">
-                                <button onclick="editarConferente(${conf.id})">Editar</button>
-                                <button onclick="toggleStatus(${conf.id})">${conf.status === 'Ativo' ? 'Desativar' : 'Ativar'}</button>
-                                <button class="delete-btn" onclick="removerConferente(${conf.id})">Remover</button>
-                            </td>
-                        `;
-                    });
-                    
-                    // Preencher select de conferentes
-                    const conferenteSelect = document.getElementById('conferente');
-                    // Limpar opções existentes exceto as duas primeiras
-                    while (conferenteSelect.options.length > 2) {
-                        conferenteSelect.remove(2);
-                    }
-                    
-                    // Adicionar conferentes ativos
-                    data.filter(c => c.status === 'Ativo').forEach(conf => {
-                        const option = document.createElement('option');
-                        option.value = conf.id;
-                        option.textContent = `${conf.nome} (${conf.estacao})`;
-                        conferenteSelect.appendChild(option);
-                    });
-                })
-                .catch(error => console.error('Erro ao carregar conferentes:', error));
-        }
-        
-        // Função para editar conferente
-        window.editarConferente = function(id) {
-            // Redirecionar para página de edição ou abrir modal
-            alert(`Editar conferente ${id} - Esta funcionalidade seria implementada completamente em um sistema real.`);
+        // Dados de produtividade (exemplo)
+        const produtividadeData = conferentes.map(conf => {
+            const produtividade = Math.floor(Math.random() * 30) + 70; // 70-100%
+            const itensVerificados = Math.floor(Math.random() * 50) + 100; // 100-150 itens
+            const horaNotificacao = new Date();
+            horaNotificacao.setMinutes(horaNotificacao.getMinutes() - Math.floor(Math.random() * 60));
             
-            // Exemplo de como seria com um formulário real:
-            // window.location.href = `editar_conferente.php?id=${id}`;
-        };
+            return {
+                id: conf.id,
+                nome: conf.nome,
+                produtividade,
+                itensVerificados,
+                status: produtividade < 75 ? "Abaixo da meta" : "Dentro da meta",
+                ultimaNotificacao: horaNotificacao.toLocaleTimeString()
+            };
+        });
         
-        // Função para ativar/desativar conferente
-        window.toggleStatus = function(id) {
-            fetch(`api/toggle_status.php?id=${id}`, {
-                method: 'POST'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(`Status do conferente alterado com sucesso!`);
-                    // Recarregar dados
-                    carregarConferentes();
-                    carregarDashboard();
-                } else {
-                    alert(`Erro ao alterar status: ${data.message}`);
+        // Função para preencher tabelas
+        function preencherTabelas() {
+            // Preencher tabela de conferentes
+            const conferentesTable = document.getElementById('conferentesTable').getElementsByTagName('tbody')[0];
+            conferentesTable.innerHTML = '';
+            
+            conferentes.forEach(conf => {
+                const row = conferentesTable.insertRow();
+                row.innerHTML = `
+                    <td>${conf.nome}</td>
+                    <td>${conf.id}</td>
+                    <td>${conf.estacao}</td>
+                    <td>${conf.status}</td>
+                    <td>
+                        <button onclick="editarConferente('${conf.id}')">Editar</button>
+                        <button onclick="toggleStatus('${conf.id}')">Ativar/Desativar</button>
+                    </td>
+                `;
+            });
+            
+            // Preencher tabela de produtividade
+            const produtividadeTable = document.getElementById('produtividadeTable').getElementsByTagName('tbody')[0];
+            produtividadeTable.innerHTML = '';
+            
+            produtividadeData.forEach(prod => {
+                const row = produtividadeTable.insertRow();
+                
+                // Determinar classe da linha baseada no status
+                const statusClass = prod.produtividade < 75 ? 'alert' : '';
+                if (statusClass) {
+                    row.classList.add(statusClass);
                 }
-            })
-            .catch(error => console.error('Erro ao alterar status:', error));
+                
+                row.innerHTML = `
+                    <td>${prod.nome}</td>
+                    <td>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: ${prod.produtividade}%">${prod.produtividade}%</div>
+                        </div>
+                    </td>
+                    <td>${prod.itensVerificados}</td>
+                    <td>${prod.status}</td>
+                    <td>${prod.ultimaNotificacao}</td>
+                `;
+            });
+            
+            // Preencher select de conferentes
+            const conferenteSelect = document.getElementById('conferente');
+            // Limpar opções existentes exceto as duas primeiras
+            while (conferenteSelect.options.length > 2) {
+                conferenteSelect.remove(2);
+            }
+            
+            // Adicionar conferentes ativos
+            conferentes.filter(c => c.status === 'Ativo').forEach(conf => {
+                const option = document.createElement('option');
+                option.value = conf.id;
+                option.textContent = `${conf.nome} (${conf.estacao})`;
+                conferenteSelect.appendChild(option);
+            });
+        }
+        
+        // Simular edição de conferente
+        window.editarConferente = function(id) {
+            alert(`Editar conferente ${id} - Esta funcionalidade seria implementada em um sistema real.`);
         };
         
-        // Função para remover conferente
-        window.removerConferente = function(id) {
-            if (confirm('Tem certeza que deseja remover este conferente? Esta ação não pode ser desfeita.')) {
-                fetch(`api/remover_conferente.php?id=${id}`, {
-                    method: 'POST'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Conferente removido com sucesso!');
-                        // Recarregar dados
-                        carregarConferentes();
-                        carregarDashboard();
-                    } else {
-                        alert(`Erro ao remover: ${data.message}`);
-                    }
-                })
-                .catch(error => console.error('Erro ao remover conferente:', error));
+        // Simular toggle de status
+        window.toggleStatus = function(id) {
+            const conferente = conferentes.find(c => c.id === id);
+            if (conferente) {
+                conferente.status = conferente.status === 'Ativo' ? 'Inativo' : 'Ativo';
+                preencherTabelas();
+                alert(`Status do conferente ${conferente.nome} alterado para ${conferente.status}.`);
             }
         };
         
         // Processar envio de notificação
         document.getElementById('notificacaoForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            const conferenteId = document.getElementById('conferente').value;
+            const produtividade = document.getElementById('produtividade').value;
+            const itensVerificados = document.getElementById('itensVerificados').value;
+            const meta = document.getElementById('meta').value;
+            const mensagem = document.getElementById('mensagem').value;
             
-            const formData = new FormData(this);
+            const confirmacao = document.getElementById('confirmacao');
             
-            fetch('api/enviar_notificacao.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                const confirmacao = document.getElementById('confirmacao');
-                
-                if (data.success) {
-                    confirmacao.classList.remove('alert');
-                    confirmacao.textContent = data.message;
-                    
-                    // Limpar formulário
-                    this.reset();
-                    
-                    // Recarregar dados
-                    carregarDashboard();
-                } else {
-                    confirmacao.classList.add('alert');
-                    confirmacao.textContent = `Erro: ${data.message}`;
-                }
-                
-                confirmacao.style.display = 'block';
-                
-                // Esconder confirmação após 3 segundos
-                setTimeout(() => {
-                    confirmacao.style.display = 'none';
-                }, 3000);
-            })
-            .catch(error => {
-                console.error('Erro ao enviar notificação:', error);
-                const confirmacao = document.getElementById('confirmacao');
+            let mensagemConfirmacao;
+            if (conferenteId === 'todos') {
+                mensagemConfirmacao = `Notificação enviada para todos os conferentes ativos.`;
+            } else if (conferenteId) {
+                const conferente = conferentes.find(c => c.id === conferenteId);
+                mensagemConfirmacao = `Notificação enviada para ${conferente.nome}.`;
+            } else {
+                mensagemConfirmacao = 'Por favor, selecione um conferente.';
                 confirmacao.classList.add('alert');
-                confirmacao.textContent = 'Erro ao enviar notificação. Tente novamente.';
+                confirmacao.textContent = mensagemConfirmacao;
                 confirmacao.style.display = 'block';
-            });
+                return;
+            }
+            
+            // Atualizar dados
+            if (conferenteId !== 'todos') {
+                const prodItem = produtividadeData.find(p => p.id === conferenteId);
+                if (prodItem) {
+                    prodItem.produtividade = parseInt(produtividade);
+                    prodItem.itensVerificados = parseInt(itensVerificados);
+                    prodItem.status = prodItem.produtividade < 75 ? "Abaixo da meta" : "Dentro da meta";
+                    prodItem.ultimaNotificacao = new Date().toLocaleTimeString();
+                }
+            }
+            
+            // Exibir confirmação
+            confirmacao.classList.remove('alert');
+            confirmacao.textContent = mensagemConfirmacao;
+            confirmacao.style.display = 'block';
+            
+            // Limpar formulário
+            this.reset();
+            
+            // Atualizar tabelas
+            preencherTabelas();
+            
+            // Esconder confirmação após 3 segundos
+            setTimeout(() => {
+                confirmacao.style.display = 'none';
+            }, 3000);
         });
         
         // Processar adição de novo conferente
         document.getElementById('novoConferenteForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            const nome = document.getElementById('nome').value;
+            const id = document.getElementById('idConferente').value;
+            const estacao = document.getElementById('estacao').value;
             
-            const formData = new FormData(this);
+            // Verificar se ID já existe
+            if (conferentes.some(c => c.id === id)) {
+                alert('Este ID já está em uso. Por favor, escolha outro.');
+                return;
+            }
             
-            fetch('api/adicionar_conferente.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Conferente adicionado com sucesso!');
-                    
-                    // Limpar formulário
-                    this.reset();
-                    
-                    // Recarregar dados
-                    carregarConferentes();
-                } else {
-                    alert(`Erro ao adicionar conferente: ${data.message}`);
-                }
-            })
-            .catch(error => {
-                console.error('Erro ao adicionar conferente:', error);
-                alert('Erro ao adicionar conferente. Tente novamente.');
+            // Adicionar novo conferente
+            conferentes.push({
+                id,
+                nome,
+                estacao,
+                status: 'Ativo'
             });
+            
+            // Adicionar dados de produtividade
+            produtividadeData.push({
+                id,
+                nome,
+                produtividade: 0,
+                itensVerificados: 0,
+                status: "Novo",
+                ultimaNotificacao: "-"
+            });
+            
+            // Atualizar tabelas
+            preencherTabelas();
+            
+            // Limpar formulário
+            this.reset();
+            
+            alert(`Conferente ${nome} adicionado com sucesso!`);
         });
         
         // Processar configurações
         document.getElementById('configForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
-            const formData = new FormData(this);
-            
-            fetch('api/salvar_configuracoes.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Configurações salvas com sucesso!');
-                    // Recarregar dashboard para refletir novas configurações
-                    carregarDashboard();
-                } else {
-                    alert(`Erro ao salvar configurações: ${data.message}`);
-                }
-            })
-            .catch(error => {
-                console.error('Erro ao salvar configurações:', error);
-                alert('Erro ao salvar configurações. Tente novamente.');
-            });
+            alert('Configurações salvas com sucesso!');
         });
         
-        // Carregar dados iniciais ao carregar a página
+        // Inicializar tabelas ao carregar a página
         window.onload = function() {
-            carregarDashboard();
-            carregarConferentes();
+            preencherTabelas();
         };
     </script>
 </body>
