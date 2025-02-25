@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Notificação de Produtividade</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background-color: white;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+        .notification {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .alert {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .chart-container {
+            height: 300px;
+            margin-top: 20px;
+        }
+        .progress-bar {
+            height: 20px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .progress {
+            height: 100%;
+            background-color: #007bff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+        .dashboard-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .dashboard-card h3 {
+            margin-top: 0;
+            color: #343a40;
+        }
+        .dashboard-stats {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .stat-box {
+            background-color: white;
+            border-radius: 6px;
+            padding: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+        }
+        .stat-box h4 {
+            margin: 0;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .stat-box p {
+            margin: 10px 0 0;
+            font-size: 24px;
+            font-weight: bold;
+            color: #343a40;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        .statusAlert {
+            background-color: #fff3cd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sistema de Notificação de Produtividade</h1>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="openTab(event, 'dashboard')">Dashboard</div>
+            <div class="tab" onclick="openTab(event, 'enviar')">Enviar Notificação</div>
+            <div class="tab" onclick="openTab(event, 'conferentes')">Gerenciar Conferentes</div>
+            <div class="tab" onclick="openTab(event, 'configuracoes')">Configurações</div>
+        </div>
+        
+        <!-- Dashboard -->
+        <div id="dashboard" class="tab-content active">
+            <div class="dashboard-card">
+                <h3>Visão Geral - Últimos 60 min</h3>
+                <div class="dashboard-stats">
+                    <div class="stat-box">
+                        <h4>Produtividade Média</h4>
+                        <p id="produtividadeMedia">--</p>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Conferentes Ativos</h4>
+                        <p id="conferentesAtivos">--</p>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Total Verificado</h4>
+                        <p id="totalVerificado">--</p>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Meta Hora</h4>
+                        <p id="metaHora">--</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Produtividade por Conferente</h3>
+                <table id="produtividadeTable">
+                    <thead>
+                        <tr>
+                            <th>Conferente</th>
+                            <th>Produtividade</th>
+                            <th>Itens Verificados</th>
+                            <th>Status</th>
+                            <th>Última Notificação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dados serão carregados via PHP -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Enviar Notificação -->
+        <div id="enviar" class="tab-content">
+            <div class="card">
+                <h3>Enviar Notificação de Produtividade</h3>
+                <form id="notificacaoForm">
+                    <div class="form-group">
+                        <label for="conferente">Conferente:</label>
+                        <select id="conferente" name="conferente" required>
+                            <option value="">Selecione um conferente</option>
+                            <option value="todos">Todos os conferentes</option>
+                            <!-- Opções serão carregadas via PHP -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="produtividade">Produtividade (últimos 60 min):</label>
+                        <input type="number" id="produtividade" name="produtividade" placeholder="Ex: 85" min="0" max="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="itensVerificados">Itens Verificados:</label>
+                        <input type="number" id="itensVerificados" name="itensVerificados" placeholder="Ex: 120" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="meta">Meta:</label>
+                        <input type="number" id="meta" name="meta" placeholder="Ex: 150" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mensagem">Mensagem Adicional (opcional):</label>
+                        <textarea id="mensagem" name="mensagem" rows="3" placeholder="Mensagem personalizada para o conferente"></textarea>
+                    </div>
+                    <button type="submit">Enviar Notificação</button>
+                </form>
+                
+                <div id="confirmacao" class="notification" style="display: none;"></div>
+            </div>
+        </div>
+        
+        <!-- Gerenciar Conferentes -->
+        <div id="conferentes" class="tab-content">
+            <div class="card">
+                <h3>Lista de Conferentes</h3>
+                <table id="conferentesTable">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>ID</th>
+                            <th>Estação</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dados serão carregados via PHP -->
+                    </tbody>
+                </table>
+                
+                <h3 style="margin-top: 20px;">Adicionar Novo Conferente</h3>
+                <form id="novoConferenteForm">
+                    <div class="form-group">
+                        <label for="nome">Nome:</label>
+                        <input type="text" id="nome" name="nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="idConferente">ID:</label>
+                        <input type="text" id="idConferente" name="idConferente" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="estacao">Estação:</label>
+                        <input type="text" id="estacao" name="estacao" required>
+                    </div>
+                    <button type="submit">Adicionar Conferente</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Configurações -->
+        <div id="configuracoes" class="tab-content">
+            <div class="card">
+                <h3>Configurações do Sistema</h3>
+                <form id="configForm">
+                    <div class="form-group">
+                        <label for="metaHoraConfig">Meta por Hora (padrão):</label>
+                        <input type="number" id="metaHoraConfig" name="metaHoraConfig" value="150" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="intervaloNotificacao">Intervalo de Notificação (minutos):</label>
+                        <input type="number" id="intervaloNotificacao" name="intervaloNotificacao" value="60" min="10" max="120" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="limiteAlerta">Limite para Alerta de Baixa Produtividade (%):</label>
+                        <input type="number" id="limiteAlerta" name="limiteAlerta" value="70" min="1" max="100" required>
+                    </div>
+                    <button type="submit">Salvar Configurações</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Função para alternar entre abas
+        function openTab(evt, tabName) {
+            const tabContents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+            
+            const tabs = document.getElementsByClassName("tab");
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove("active");
+            }
+            
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+        
+        // Carregar dados do dashboard
+        function carregarDashboard() {
+            fetch('api/dashboard.php')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('produtividadeMedia').textContent = data.produtividadeMedia + '%';
+                    document.getElementById('conferentesAtivos').textContent = data.conferentesAtivos;
+                    document.getElementById('totalVerificado').textContent = data.totalVerificado;
+                    document.getElementById('metaHora').textContent = data.metaHora;
+                    
+                    // Carregar tabela de produtividade
+                    const produtividadeTable = document.getElementById('produtividadeTable').getElementsByTagName('tbody')[0];
+                    produtividadeTable.innerHTML = '';
+                    
+                    data.produtividade.forEach(prod => {
+                        const row = produtividadeTable.insertRow();
+                        
+                        // Determinar classe da linha baseada no status
+                        if (prod.produtividade < data.limiteAlerta) {
+                            row.classList.add('statusAlert');
+                        }
+                        
+                        row.innerHTML = `
+                            <td>${prod.nome}</td>
+                            <td>
+                                <div class="progress-bar">
+                                    <div class="progress" style="width: ${prod.produtividade}%">${prod.produtividade}%</div>
+                                </div>
+                            </td>
+                            <td>${prod.itensVerificados}</td>
+                            <td>${prod.produtividade < data.limiteAlerta ? 'Abaixo da meta' : 'Dentro da meta'}</td>
+                            <td>${prod.ultimaNotificacao}</td>
+                        `;
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar dashboard:', error));
+        }
+        
+        // Carregar lista de conferentes
+        function carregarConferentes() {
+            fetch('api/conferentes.php')
+                .then(response => response.json())
+                .then(data => {
+                    // Preencher tabela de conferentes
+                    const conferentesTable = document.getElementById('conferentesTable').getElementsByTagName('tbody')[0];
+                    conferentesTable.innerHTML = '';
+                    
+                    data.forEach(conf => {
+                        const row = conferentesTable.insertRow();
+                        row.innerHTML = `
+                            <td>${conf.nome}</td>
+                            <td>${conf.id}</td>
+                            <td>${conf.estacao}</td>
+                            <td>${conf.status}</td>
+                            <td class="action-buttons">
+                                <button onclick="editarConferente(${conf.id})">Editar</button>
+                                <button onclick="toggleStatus(${conf.id})">${conf.status === 'Ativo' ? 'Desativar' : 'Ativar'}</button>
+                                <button class="delete-btn" onclick="removerConferente(${conf.id})">Remover</button>
+                            </td>
+                        `;
+                    });
+                    
+                    // Preencher select de conferentes
+                    const conferenteSelect = document.getElementById('conferente');
+                    // Limpar opções existentes exceto as duas primeiras
+                    while (conferenteSelect.options.length > 2) {
+                        conferenteSelect.remove(2);
+                    }
+                    
+                    // Adicionar conferentes ativos
+                    data.filter(c => c.status === 'Ativo').forEach(conf => {
+                        const option = document.createElement('option');
+                        option.value = conf.id;
+                        option.textContent = `${conf.nome} (${conf.estacao})`;
+                        conferenteSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar conferentes:', error));
+        }
+        
+        // Função para editar conferente
+        window.editarConferente = function(id) {
+            // Redirecionar para página de edição ou abrir modal
+            alert(`Editar conferente ${id} - Esta funcionalidade seria implementada completamente em um sistema real.`);
+            
+            // Exemplo de como seria com um formulário real:
+            // window.location.href = `editar_conferente.php?id=${id}`;
+        };
+        
+        // Função para ativar/desativar conferente
+        window.toggleStatus = function(id) {
+            fetch(`api/toggle_status.php?id=${id}`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`Status do conferente alterado com sucesso!`);
+                    // Recarregar dados
+                    carregarConferentes();
+                    carregarDashboard();
+                } else {
+                    alert(`Erro ao alterar status: ${data.message}`);
+                }
+            })
+            .catch(error => console.error('Erro ao alterar status:', error));
+        };
+        
+        // Função para remover conferente
+        window.removerConferente = function(id) {
+            if (confirm('Tem certeza que deseja remover este conferente? Esta ação não pode ser desfeita.')) {
+                fetch(`api/remover_conferente.php?id=${id}`, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Conferente removido com sucesso!');
+                        // Recarregar dados
+                        carregarConferentes();
+                        carregarDashboard();
+                    } else {
+                        alert(`Erro ao remover: ${data.message}`);
+                    }
+                })
+                .catch(error => console.error('Erro ao remover conferente:', error));
+            }
+        };
+        
+        // Processar envio de notificação
+        document.getElementById('notificacaoForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch('api/enviar_notificacao.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const confirmacao = document.getElementById('confirmacao');
+                
+                if (data.success) {
+                    confirmacao.classList.remove('alert');
+                    confirmacao.textContent = data.message;
+                    
+                    // Limpar formulário
+                    this.reset();
+                    
+                    // Recarregar dados
+                    carregarDashboard();
+                } else {
+                    confirmacao.classList.add('alert');
+                    confirmacao.textContent = `Erro: ${data.message}`;
+                }
+                
+                confirmacao.style.display = 'block';
+                
+                // Esconder confirmação após 3 segundos
+                setTimeout(() => {
+                    confirmacao.style.display = 'none';
+                }, 3000);
+            })
+            .catch(error => {
+                console.error('Erro ao enviar notificação:', error);
+                const confirmacao = document.getElementById('confirmacao');
+                confirmacao.classList.add('alert');
+                confirmacao.textContent = 'Erro ao enviar notificação. Tente novamente.';
+                confirmacao.style.display = 'block';
+            });
+        });
+        
+        // Processar adição de novo conferente
+        document.getElementById('novoConferenteForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch('api/adicionar_conferente.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Conferente adicionado com sucesso!');
+                    
+                    // Limpar formulário
+                    this.reset();
+                    
+                    // Recarregar dados
+                    carregarConferentes();
+                } else {
+                    alert(`Erro ao adicionar conferente: ${data.message}`);
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao adicionar conferente:', error);
+                alert('Erro ao adicionar conferente. Tente novamente.');
+            });
+        });
+        
+        // Processar configurações
+        document.getElementById('configForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch('api/salvar_configuracoes.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Configurações salvas com sucesso!');
+                    // Recarregar dashboard para refletir novas configurações
+                    carregarDashboard();
+                } else {
+                    alert(`Erro ao salvar configurações: ${data.message}`);
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao salvar configurações:', error);
+                alert('Erro ao salvar configurações. Tente novamente.');
+            });
+        });
+        
+        // Carregar dados iniciais ao carregar a página
+        window.onload = function() {
+            carregarDashboard();
+            carregarConferentes();
+        };
+    </script>
+</body>
+</html>
